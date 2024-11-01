@@ -1,16 +1,17 @@
 const express = require("express");
-const {
-  getUserController,
-  updateUserController,
-} = require("../controllers/userController");
 const authMiddleware = require("../middlewares/authMiddleware");
+const {
+  updateUserController,
+  getUserController,
+} = require("../controllers/userController");
+
 const router = express.Router();
 
 //routes
-//get user
+// GET USER || GET
 router.get("/getUser", authMiddleware, getUserController);
 
-//update user
+// UPDATE PROFILE
 router.put("/updateUser", authMiddleware, updateUserController);
 
 module.exports = router;

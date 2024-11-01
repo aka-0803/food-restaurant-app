@@ -6,6 +6,7 @@ const getUserController = async (req, res) => {
   try {
     //find user
     const user = await userModel.findById({ _id: req.body.id });
+    console.log("user",user);
     if (!user) {
       return res.status(404).send({
         success: false,
