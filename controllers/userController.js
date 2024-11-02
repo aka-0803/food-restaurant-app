@@ -6,7 +6,7 @@ const getUserController = async (req, res) => {
   try {
     //find user
     const user = await userModel.findById({ _id: req.body.id });
-    console.log("user",user);
+    console.log("user", user);
     if (!user) {
       return res.status(404).send({
         success: false,
@@ -66,4 +66,112 @@ const updateUserController = async (req, res) => {
   }
 };
 
-module.exports = { getUserController, updateUserController };
+//update password
+const updatePasswordController = async (req, res) => {
+  try {
+    const user = await userModel.findById({ _id: req.body.id });
+    //check user
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    const { oldPassword, newPassword } = req.body;
+    if (!oldPassword || !newPassword) {
+      return res.status(500).send({
+        success: false,
+        message: "Pls Provide the Both the passwords",
+      });
+    }
+    //compare
+    const isMatch = await bcrypt.compare(oldPassword, user.password);
+
+    if (!isMatch) {
+      return res.status(500).send({
+        success: false,
+        message: "Invalid current password",
+      });
+    }
+
+    //hash
+    let salt = bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).send({
+      success: true,
+      message: "password updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "Error in update password api",
+    });
+  }
+};
+
+//reset password
+const resetPasswordController = async (req, res) => {
+  try {
+    const { email, newPassword, answer } = req.body;
+    if (!email || !newPassword || !answer) {
+      return res.status(500).send({
+        success: false,
+        message: "Pls provide all fields",
+      });
+    }
+    const user = await userModel.findOne({ email, answer });
+    if (!user) {
+      return res.status(404).send({
+        success: false,
+        message: "User not found",
+      });
+    }
+
+    //hash
+    let salt = bcrypt.genSaltSync(10);
+    const hashedPassword = await bcrypt.hash(newPassword, salt);
+    user.password = hashedPassword;
+    await user.save();
+
+    res.status(200).send({
+      success: true,
+      message: "password reset successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).send({
+      success: false,
+      message: "error in reset password api",
+    });
+  }
+};
+
+//delete account
+const deleteProfileController = async (req, res) => {
+  try {
+    await userModel.findByIdAndDelete(req.params.id);
+    return res.status(200).send({
+      success: true,
+      message: "Successfully deleted account",
+    });
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).send({
+      success: false,
+      message: "Error in delete profile api",
+    });
+  }
+};
+
+module.exports = {
+  getUserController,
+  updateUserController,
+  updatePasswordController,
+  resetPasswordController,
+  deleteProfileController,
+};

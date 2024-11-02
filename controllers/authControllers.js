@@ -5,9 +5,9 @@ const bcrypt = require("bcryptjs");
 //REGISTER
 const registerController = async (req, res) => {
   try {
-    const { userName, email, password, phone, address } = req.body;
+    const { userName, email, password, phone, address, answer } = req.body;
     //validation
-    if (!userName || !email || !password || !phone || !address) {
+    if (!userName || !email || !password || !phone || !address || !answer) {
       res.status(500).send({
         success: false,
         message: "Please Provide All Fields",
@@ -31,6 +31,7 @@ const registerController = async (req, res) => {
       phone,
       address,
       password: hashedPassword,
+      answer,
     });
     res.status(201).send({
       success: true,
