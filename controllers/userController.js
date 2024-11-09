@@ -45,10 +45,11 @@ const updateUserController = async (req, res) => {
       });
     }
     // update part
-    const { userName, address, phone } = req.body;
+    const { userName, address, phone, userType } = req.body;
     if (userName) user.userName = userName;
     if (address) user.address = address;
     if (phone) user.phone = phone;
+    if (userType) user.userType = userType;
     //save user
     await user.save();
 
